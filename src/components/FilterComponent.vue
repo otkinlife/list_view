@@ -9,6 +9,8 @@
       <select v-else-if="filter.type === 'select'" :id="filter.key" v-model="filter.value">
         <option v-for="option in filter.options" :key="option.value" :value="option.value">{{ option.label }}</option>
       </select>
+      <!--日期范围选择器-->
+      <el-date-picker v-else-if="filter.type === 'date_range'" :id="filter.key" v-model="filter.value" type="daterange" style="max-width: 200px; font-size: 12px" />
       <!--实现各种组件 End-->
     </div>
     <div class="filter-buttons">
@@ -33,6 +35,7 @@ export default {
   }
 };
 </script>
+
 <style scoped>
 .filter-container {
   display: flex;
@@ -55,13 +58,14 @@ export default {
 
 .filter-item input,
 .filter-item select {
-  max-width: 120px;
-  padding: 3px;
-  border: 1px solid #ccc;
-  border-radius: 2px;
-  font-size: 12px;
-  flex: 1;
+  max-width: 120px !important;
+  padding: 8px !important;
+  border: 1px solid #ccc !important;
+  border-radius: 3px !important;
+  font-size: 12px !important;
+  flex: 1 !important;
 }
+
 
 .filter-buttons {
   display: flex;

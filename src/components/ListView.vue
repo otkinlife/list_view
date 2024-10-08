@@ -30,7 +30,9 @@ import FilterComponent from './FilterComponent.vue';
 import ToolbarComponent from './ToolbarComponent.vue';
 import TableComponent from './TableComponent.vue';
 import PaginationComponent from './PaginationComponent.vue';
-import * as tool_handlers from './filed_handlers/tools_handler'; // Import all handlers
+import * as tool_handlers from '@/components/utils/tools_handler'; // Import all handlers
+import * as auth_handlers from '@/components/utils/auth_handler';
+
 
 
 export default {
@@ -87,8 +89,24 @@ export default {
             // 如果是 select 类型，则加载字典数据
             if (filterField.type === 'select' && filterField.load_data_req) {
               try {
-                const { url, method, params } = filterField.load_data_req;
-                const response = await axios({ method, url, params });
+                const { url, method, params, auth } = filterField.load_data_req;
+                let axiosConfig = { method, url, params };
+
+                // 如果配置了 auth，则调用对应的鉴权方法
+                if (auth && auth_handlers[auth]) {
+                  const authData = await auth_handlers[auth]();
+                  axiosConfig = {
+                    ...axiosConfig,
+                    ...authData
+                  };
+                }
+                const response = await axios(axiosConfig);
+                if (response.data && Array.isArray(response.data)) {
+                  filter.options = response.data.map(item => ({
+                    value: item.value,
+                    label: item.label
+                  }));
+                }
                 if (response.data.code === 0 && response.data && Array.isArray(response.data.data)) {
                   filter.options = response.data.data.map(item => ({
                     value: item.value,

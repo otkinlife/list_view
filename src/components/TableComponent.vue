@@ -7,7 +7,7 @@
 </template>
 
 <script>
-import * as handlers from '@/components/filed_handlers/customer_filed_handler';
+import * as handlers from '@/components/utils/customer_filed_handler';
 
 export default {
   props: {
