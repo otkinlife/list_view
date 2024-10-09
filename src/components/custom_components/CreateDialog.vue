@@ -117,6 +117,7 @@ export default {
               // 缓存字典数据
               this.$parent.dictCache[dictKey] = options;
               this.componentPropsCache[key] = {
+                format: field.format,
                 placeholder: field.placeholder,
                 options: options
               };

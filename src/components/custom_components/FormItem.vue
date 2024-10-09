@@ -22,8 +22,9 @@
   </el-form-item>
 </template>
 
-
 <script>
+import dayjs from 'dayjs';
+
 export default {
   name: 'FormItem',
   props: {
@@ -42,10 +43,18 @@ export default {
   },
   methods: {
     handleInput(event) {
-      this.$emit('update:modelValue', event);
+      const format = this.componentProps.format || 'YYYY-MM-DD';
+      this.$emit('update:modelValue', this.formatDateValue(event, format));
     },
     handleUpdateModelValue(value) {
-      this.$emit('update:modelValue', value);
+      const format = this.componentProps.format || 'YYYY-MM-DD';
+      this.$emit('update:modelValue', this.formatDateValue(value, format));
+    },
+    formatDateValue(value, format) {
+      if (Array.isArray(value)) {
+        return value.map(date => dayjs(date).format(format));
+      }
+      return dayjs(value).format(format);
     }
   }
 };

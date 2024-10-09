@@ -101,7 +101,8 @@
                     "isHint": false,
                     "filter_field": {
                         "type": "date_range",
-                        "placeholder": "请选择日期"
+                        "format": "YYYY-MM-DD HH:mm:ss",
+                        "placeholder": "请选择日期范围"
                     },
                     "isSupportSort": true,
                     "order": 3
@@ -131,6 +132,10 @@
                                             "label": "城市",
                                             "type": "select",
                                             "dict_bind": "city"
+                                        },
+                                        "date": {
+                                            "label": "日期",
+                                            "type": "date_range"
                                         }
                                     }
                                 }

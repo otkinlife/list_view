@@ -8,8 +8,7 @@
         :sortable="column.isSupportSort ? 'custom' : false"
     >
       <template v-slot="scope">
-        <span v-if="column.handler">{{ applyHandler(scope.row[key], column.handler) }}</span>
-        <span v-else>{{ scope.row[key] }}</span>
+        <span>{{ scope.row[key] }}</span>
       </template>
     </el-table-column>
 
@@ -56,13 +55,6 @@ export default {
       }
       return value;
     },
-    handleOptionClick(tool, row) {
-      if (tool.style_type === 'create_dialog') {
-        this.$emit('tool-click', tool.style_type, { ...tool.config, row });
-      } else if (tool.style_type === 'custom_handler') {
-        this.$emit('tool-click', tool.style_type, { ...tool.config, row });
-      }
-    }
   },
   computed: {
     processedTableData() {
