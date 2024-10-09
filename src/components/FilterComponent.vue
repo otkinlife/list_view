@@ -50,6 +50,7 @@ export default {
 
       if (filter.type === 'date_range') {
         props.type = 'daterange';
+        props.format = filter.format;
         props.style = { maxWidth: '200px', fontSize: '12px' };
       }
 

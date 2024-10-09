@@ -91,7 +91,8 @@ export default {
               value: '',
               placeholder: filterField.placeholder,
               options: [],
-              label: this.config.level_config[0].columns[key].label
+              label: this.config.level_config[0].columns[key].label,
+              format: filterField.format
             };
 
             // 如果是 select 类型，则加载字典数据

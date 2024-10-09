@@ -43,11 +43,11 @@ export default {
   },
   methods: {
     handleInput(event) {
-      const format = this.componentProps.format || 'YYYY-MM-DD';
+      const format = this.componentProps.format || 'YYYY-MM-DD HH:mm:ss';
       this.$emit('update:modelValue', this.formatDateValue(event, format));
     },
     handleUpdateModelValue(value) {
-      const format = this.componentProps.format || 'YYYY-MM-DD';
+      const format = this.componentProps.format || 'YYYY-MM-DD HH:mm:ss';
       this.$emit('update:modelValue', this.formatDateValue(value, format));
     },
     formatDateValue(value, format) {
