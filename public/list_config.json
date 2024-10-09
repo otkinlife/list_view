@@ -80,7 +80,8 @@
                     "isHint": false,
                     "filter_field": {
                         "type": "select",
-                        "dict_bind": "city"
+                        "dict_bind": "city",
+                        "placeholder": "请选择城市"
                     },
                     "isSupportSort": true,
                     "order": 1
