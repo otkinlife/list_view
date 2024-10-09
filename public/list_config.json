@@ -67,7 +67,7 @@
             "columns": {
                 "id": {
                     "label": "ID",
-                    "isHint": false,
+                    "isHint": true,
                     "filter_field": {
                         "type": "text",
                         "placeholder": "请输入ID"
@@ -105,6 +105,46 @@
                     },
                     "isSupportSort": true,
                     "order": 3
+                },
+                "options": {
+                    "label": "操作",
+                    "tools": [
+                        {
+                            "type": "button",
+                            "label": "编辑",
+                            "style_type": "edit_dialog",
+                            "config": {
+                                "req": {
+                                    "url": "http://localhost:8088/edit",
+                                    "method": "post",
+                                    "columns": {
+                                        "id": {
+                                            "label": "ID",
+                                            "type": "only_read"
+                                        },
+                                        "name": {
+                                            "label": "姓名",
+                                            "type": "select",
+                                            "dict_bind": "name"
+                                        },
+                                        "city": {
+                                            "label": "城市",
+                                            "type": "select",
+                                            "dict_bind": "city"
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        {
+                            "type": "button",
+                            "label": "删除",
+                            "style_type": "custom_handler",
+                            "config": {
+                                "handler": "function1"
+                            }
+                        }
+                    ]
                 }
             },
             "request": {

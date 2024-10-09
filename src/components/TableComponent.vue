@@ -1,7 +1,35 @@
 <template>
   <el-table :data="processedTableData" @sort-change="handleSortChange">
-    <el-table-column v-for="(column, key) in columns" :key="key" :prop="key" :label="column.label"
-                     :sortable="column.isSupportSort ? 'custom' : false">
+    <el-table-column
+        v-for="(column, key) in filteredColumns"
+        :key="key"
+        :prop="key"
+        :label="column.label"
+        :sortable="column.isSupportSort ? 'custom' : false"
+    >
+      <template v-slot="scope">
+        <span v-if="column.handler">{{ applyHandler(scope.row[key], column.handler) }}</span>
+        <span v-else>{{ scope.row[key] }}</span>
+      </template>
+    </el-table-column>
+
+    <!-- 操作列 -->
+    <el-table-column
+        v-if="columns.options"
+        :key="'options'"
+        :label="columns.options.label"
+    >
+      <template v-slot="scope">
+        <span v-for="(tool, index) in columns.options.tools" :key="tool.label">
+          <el-link
+              @click="$emit('tool-click', tool.style_type, { ...tool.config, row: scope.row })"
+              type="primary"
+          >
+            {{ tool.label }}
+          </el-link>
+          <span v-if="index < columns.options.tools.length - 1" class="divider">|</span>
+        </span>
+      </template>
     </el-table-column>
   </el-table>
 </template>
@@ -27,6 +55,13 @@ export default {
         return handlers[handlerName](value);
       }
       return value;
+    },
+    handleOptionClick(tool, row) {
+      if (tool.style_type === 'create_dialog') {
+        this.$emit('tool-click', tool.style_type, { ...tool.config, row });
+      } else if (tool.style_type === 'custom_handler') {
+        this.$emit('tool-click', tool.style_type, { ...tool.config, row });
+      }
     }
   },
   computed: {
@@ -42,6 +77,15 @@ export default {
         }
         return processedRow;
       });
+    },
+    filteredColumns() {
+      const filtered = {};
+      for (const key in this.columns) {
+        if (!this.columns[key].isHint && key !== 'options') {
+          filtered[key] = this.columns[key];
+        }
+      }
+      return filtered;
     }
   },
   data() {
@@ -53,6 +97,10 @@ export default {
 };
 </script>
 
+
 <style scoped>
-/* 添加样式 */
+.divider {
+  margin: 0 8px;
+  color: #ccc;
+}
 </style>

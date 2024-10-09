@@ -1,6 +1,7 @@
 <template>
   <el-form-item :label="label">
     <component
+        v-if="componentType !== 'only_read'"
         :is="componentType"
         :model-value="modelValue"
         v-bind="componentProps"
@@ -17,8 +18,10 @@
         ></el-option>
       </template>
     </component>
+    <span v-else :style="{ minWidth: minWidth, maxWidth: maxWidth }">{{ modelValue }}</span>
   </el-form-item>
 </template>
+
 
 <script>
 export default {

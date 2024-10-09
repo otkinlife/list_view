@@ -1,7 +1,7 @@
 <template>
   <el-dialog
       v-model="dialogVisible"
-      title="新建"
+      title="编辑"
       width="50%"
       @close="handleClose"
   >
@@ -33,7 +33,7 @@ import FormItem from './FormItem.vue'; // 引入通用表单项组件
 import * as auth_handlers from '@/components/utils/auth_handler'; // Import all handlers
 
 export default {
-  name: 'CreateDialog',
+  name: 'EditDialog',
   components: {
     FormItem
   },
@@ -51,19 +51,19 @@ export default {
     };
   },
   methods: {
-    async createRow(config) {
+    async editRow(config) {
       this.config = config || { req: { data: {} } };
-      this.resetForm();
+      this.resetForm(this.config.row);
       await this.initializeComponentProps();
       this.dialogVisible = true;
       this.formKey++; // 改变 key 值以强制重新渲染表单
     },
-    resetForm() {
+    resetForm(rowData) {
       this.form = {};
       this.componentPropsCache = {}; // 重置缓存
-      if (this.config.req && this.config.req.data) {
-        for (const key in this.config.req.data) {
-          this.form[key] = '';
+      if (this.config.req && rowData) {
+        for (const key in rowData) {
+          this.form[key] = rowData[key] || '';
         }
       }
     },

@@ -1,7 +1,6 @@
 <template>
   <div class="container">
     <div v-if="config">
-
       <div class="card">
         <!-- 工具栏 -->
         <ToolbarComponent :tools="config.tools" @tool-click="handleTool" />
@@ -14,7 +13,7 @@
 
       <div class="card">
         <!-- 列表展示 -->
-        <TableComponent :tableData="tableData" :columns="columns" @sort-change="handleFieldSort" />
+        <TableComponent :tableData="tableData" :columns="columns" @sort-change="handleFieldSort" @tool-click="handleTool" />
 
         <!-- 分页组件 -->
         <PaginationComponent v-if="config.isPageable" :currentPage="currentPage" :pageSize="pageSize" :total="total" @current-change="handleCurrentChange" />
@@ -23,9 +22,10 @@
 
     <!-- CreateDialog 组件实例 -->
     <CreateDialog ref="createDialog" />
+    <!-- EditDialog 组件实例 -->
+    <EditDialog ref="editDialog" />
   </div>
 </template>
-
 
 <script>
 import axios from 'axios';
@@ -35,11 +35,10 @@ import TableComponent from './TableComponent.vue';
 import PaginationComponent from './PaginationComponent.vue';
 
 import CreateDialog from './custom_components/CreateDialog.vue';
+import EditDialog from './custom_components/EditDialog.vue';
 
 import * as tool_handlers from '@/components/utils/tools_handler'; // Import all handlers
 import * as auth_handlers from '@/components/utils/auth_handler';
-
-
 
 export default {
   components: {
@@ -47,7 +46,8 @@ export default {
     ToolbarComponent,
     TableComponent,
     PaginationComponent,
-    CreateDialog
+    CreateDialog,
+    EditDialog
   },
   data() {
     return {
@@ -228,7 +228,7 @@ export default {
       const sortField = typeof field === 'string' ? field : '';
       const sortOrder = typeof order === 'string' ? order : '';
       if (sortField === '' && sortOrder === '') {
-          return;
+        return;
       }
       if (this.sortField !== sortField || this.sortOrder !== sortOrder) {
         this.sortField = sortField;
@@ -238,9 +238,12 @@ export default {
     },
     handleTool(style_type, config) {
       if (style_type === 'create_dialog') {
-        this.$refs.createDialog.create(config);
-      } else if (style_type === 'custom_handler') {
-        tool_handlers[config.handler]();
+        this.$refs.createDialog.createRow(config);
+      } else if (style_type === 'edit_dialog') {
+        this.$refs.editDialog.editRow(config);
+      }
+      else if (style_type === 'custom_handler') {
+        tool_handlers[config.handler](config.row);
       }
     },
     handleCurrentChange(page) {
