@@ -20,6 +20,9 @@
         <PaginationComponent v-if="config.isPageable" :currentPage="currentPage" :pageSize="pageSize" :total="total" @current-change="handleCurrentChange" />
       </div>
     </div>
+
+    <!-- CreateDialog 组件实例 -->
+    <CreateDialog ref="createDialog" />
   </div>
 </template>
 
@@ -30,6 +33,9 @@ import FilterComponent from './FilterComponent.vue';
 import ToolbarComponent from './ToolbarComponent.vue';
 import TableComponent from './TableComponent.vue';
 import PaginationComponent from './PaginationComponent.vue';
+
+import CreateDialog from './custom_components/CreateDialog.vue';
+
 import * as tool_handlers from '@/components/utils/tools_handler'; // Import all handlers
 import * as auth_handlers from '@/components/utils/auth_handler';
 
@@ -40,7 +46,8 @@ export default {
     FilterComponent,
     ToolbarComponent,
     TableComponent,
-    PaginationComponent
+    PaginationComponent,
+    CreateDialog
   },
   data() {
     return {
@@ -51,7 +58,8 @@ export default {
       pageSize: 10,
       total: 0,
       sortField: '',
-      sortOrder: ''
+      sortOrder: '',
+      dictCache: {} // 全局字典缓存
     };
   },
   computed: {
@@ -87,34 +95,51 @@ export default {
             };
 
             // 如果是 select 类型，则加载字典数据
-            if (filterField.type === 'select' && filterField.load_data_req) {
-              try {
-                const { url, method, params, auth } = filterField.load_data_req;
-                let axiosConfig = { method, url, params };
+            if (filterField.type === 'select' && filterField.dict_bind) {
+              const dictKey = filterField.dict_bind;
+              if (this.dictCache[dictKey]) {
+                // 从缓存中获取字典数据
+                filter.options = this.dictCache[dictKey];
+              } else {
+                try {
+                  const dictConfig = this.config.dict[dictKey];
+                  if (dictConfig.source === 'static') {
+                    this.dictCache[dictKey] = dictConfig.data.map(item => ({
+                      value: item.value,
+                      label: item.label
+                    }));
+                  } else if (dictConfig.source === 'req') {
+                    const { url, method, params, auth } = dictConfig.req;
+                    let axiosConfig = { method, url, params };
 
-                // 如果配置了 auth，则调用对应的鉴权方法
-                if (auth && auth_handlers[auth]) {
-                  const authData = await auth_handlers[auth]();
-                  axiosConfig = {
-                    ...axiosConfig,
-                    ...authData
-                  };
+                    // 如果配置了 auth，则调用对应的鉴权方法
+                    if (auth && auth_handlers[auth]) {
+                      const authData = await auth_handlers[auth]();
+                      axiosConfig = {
+                        ...axiosConfig,
+                        ...authData
+                      };
+                    }
+
+                    const response = await axios(axiosConfig);
+                    if (response.data && Array.isArray(response.data)) {
+                      filter.options = response.data.map(item => ({
+                        value: item.value,
+                        label: item.label
+                      }));
+                    } else if (response.data.code === 0 && Array.isArray(response.data.data)) {
+                      filter.options = response.data.data.map(item => ({
+                        value: item.value,
+                        label: item.label
+                      }));
+                    }
+                  }
+
+                  // 缓存字典数据
+                  this.dictCache[dictKey] = filter.options;
+                } catch (error) {
+                  console.error(`Error loading filter data for ${key}:`, error);
                 }
-                const response = await axios(axiosConfig);
-                if (response.data && Array.isArray(response.data)) {
-                  filter.options = response.data.map(item => ({
-                    value: item.value,
-                    label: item.label
-                  }));
-                }
-                if (response.data.code === 0 && response.data && Array.isArray(response.data.data)) {
-                  filter.options = response.data.data.map(item => ({
-                    value: item.value,
-                    label: item.label
-                  }));
-                }
-              } catch (error) {
-                console.error(`Error loading filter data for ${key}:`, error);
               }
             }
 
@@ -211,9 +236,11 @@ export default {
         this.fetchData();
       }
     },
-    handleTool(handler) {
-      if (tool_handlers[handler]) {
-        tool_handlers[handler]();
+    handleTool(style_type, config) {
+      if (style_type === 'create_dialog') {
+        this.$refs.createDialog.create(config);
+      } else if (style_type === 'custom_handler') {
+        tool_handlers[config.handler]();
       }
     },
     handleCurrentChange(page) {

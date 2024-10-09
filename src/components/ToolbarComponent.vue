@@ -1,6 +1,6 @@
 <template>
   <div class="toolbar-container">
-    <button v-for="tool in tools" :key="tool.label" @click="$emit('tool-click', tool.handler)">
+    <button v-for="tool in tools" :key="tool.label" @click="$emit('tool-click', tool.style_type, tool.config)">
       {{ tool.label }}
     </button>
   </div>

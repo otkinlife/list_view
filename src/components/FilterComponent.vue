@@ -1,17 +1,12 @@
 <template>
   <div class="filter-container">
     <div class="filter-item" v-for="filter in filters" :key="filter.key">
-      <label :for="filter.key">{{ filter.label }}</label>
-      <!--实现各种组件 Start-->
-      <!--输入框-->
-      <input v-if="filter.type === 'text'" :id="filter.key" v-model="filter.value" type="text" />
-      <!--下拉框-->
-      <select v-else-if="filter.type === 'select'" :id="filter.key" v-model="filter.value">
-        <option v-for="option in filter.options" :key="option.value" :value="option.value">{{ option.label }}</option>
-      </select>
-      <!--日期范围选择器-->
-      <el-date-picker v-else-if="filter.type === 'date_range'" :id="filter.key" v-model="filter.value" type="daterange" style="max-width: 200px; font-size: 12px" />
-      <!--实现各种组件 End-->
+      <FormItem
+          :label="filter.label"
+          v-model="filter.value"
+          :componentType="getComponentType(filter)"
+          :componentProps="getComponentProps(filter)"
+      />
     </div>
     <div class="filter-buttons">
       <button @click="search">查询</button>
@@ -21,11 +16,45 @@
 </template>
 
 <script>
+import FormItem from './custom_components/FormItem.vue'; // 引入通用表单项组件
+
 export default {
+  name: 'FilterComponent',
+  components: {
+    FormItem
+  },
   props: {
-    filters: Object,
+    filters: Array // 这里应该是 Array 类型而不是 Object
   },
   methods: {
+    getComponentType(filter) {
+      switch (filter.type) {
+        case 'text':
+          return 'el-input';
+        case 'select':
+          return 'el-select';
+        case 'date_range':
+          return 'el-date-picker';
+        default:
+          return 'el-input'; // 默认类型
+      }
+    },
+    getComponentProps(filter) {
+      const props = {
+        placeholder: filter.placeholder || ''
+      };
+
+      if (filter.type === 'select') {
+        props.options = filter.options || [];
+      }
+
+      if (filter.type === 'date_range') {
+        props.type = 'daterange';
+        props.style = { maxWidth: '200px', fontSize: '12px' };
+      }
+
+      return props;
+    },
     search() {
       this.$emit('search');
     },
@@ -49,23 +78,6 @@ export default {
   align-items: center;
   gap: 10px;
 }
-
-.filter-item label {
-  font-weight: bold;
-  font-size: 12px;
-  white-space: nowrap;
-}
-
-.filter-item input,
-.filter-item select {
-  max-width: 120px !important;
-  padding: 8px !important;
-  border: 1px solid #ccc !important;
-  border-radius: 3px !important;
-  font-size: 12px !important;
-  flex: 1 !important;
-}
-
 
 .filter-buttons {
   display: flex;

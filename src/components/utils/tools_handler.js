@@ -1,6 +1,6 @@
 // 工具按钮的处理函数
 
-export function create() {
+export function function1() {
     console.log('create');
-    alert(2333);
+    alert(2333)
 }

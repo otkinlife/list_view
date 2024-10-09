@@ -5,14 +5,63 @@
         {
             "type": "button",
             "label": "新增",
-            "handler": "create"
+            "style_type": "create_dialog",
+            "config": {
+                "req": {
+                    "url": "http://localhost:8088/create",
+                    "method": "post",
+                    "columns": {
+                        "name": {
+                            "label": "姓名",
+                            "type": "select",
+                            "dict_bind": "name"
+                        },
+                        "city": {
+                            "label": "城市",
+                            "type": "select",
+                            "dict_bind": "city"
+                        }
+                    }
+                }
+            }
         },
         {
             "type": "button",
             "label": "删除",
-            "handler": "function2"
+            "style_type": "custom_handler",
+            "config": {
+                "handler": "function1"
+            }
         }
     ],
+    "dict": {
+        "city":{
+            "source": "req",
+            "type": "label_value",
+            "req": {
+                "url": "http://localhost:8088/city",
+                "auth": "defaultAuth",
+                "method": "GET",
+                "params": {
+                    "conditions": "city"
+                }
+            }
+        },
+        "name": {
+            "source": "static",
+            "type": "label_value",
+            "data": [
+                {
+                    "label": "张三",
+                    "value": "1"
+                },
+                {
+                    "label": "李四",
+                    "value": "2"
+                }
+            ]
+        }
+    },
     "level_config": [
         {
             "columns": {
@@ -31,14 +80,7 @@
                     "isHint": false,
                     "filter_field": {
                         "type": "select",
-                        "load_data_req": {
-                            "url": "http://localhost:8088/city",
-                            "auth": "defaultAuth",
-                            "method": "GET",
-                            "params": {
-                                "conditions": "city"
-                            }
-                        }
+                        "dict_bind": "city"
                     },
                     "isSupportSort": true,
                     "order": 1
