@@ -5,7 +5,7 @@
         :key="key"
         :prop="key"
         :label="column.label"
-        :sortable="column.isSupportSort ? 'custom' : false"
+        :sortable="column.is_support_sort ? 'custom' : false"
     >
       <template v-slot="scope">
         <span>{{ scope.row[key] }}</span>

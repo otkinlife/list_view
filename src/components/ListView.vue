@@ -16,7 +16,7 @@
         <TableComponent :tableData="tableData" :columns="columns" @sort-change="handleFieldSort" @tool-click="handleTool" />
 
         <!-- 分页组件 -->
-        <PaginationComponent v-if="config.isPageable" :currentPage="currentPage" :pageSize="pageSize" :total="total" @current-change="handleCurrentChange" />
+        <PaginationComponent v-if="config.is_pageable" :currentPage="currentPage" :pageSize="pageSize" :total="total" @current-change="handleCurrentChange" />
       </div>
     </div>
 
@@ -161,7 +161,7 @@ export default {
     // 加载列表数据
     async fetchData() {
       try {
-        const {method, url, params, headers, contentType} = this.config.level_config[0].request;
+        const {method, url, params, headers, contentType} = this.config.level_config[0].req;
 
         // 构建请求参数
         let requestData = {

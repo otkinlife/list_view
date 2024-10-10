@@ -9,7 +9,8 @@
 ### 1. 配置
 在public文件夹下创建list_config.json文件：
 #### 示例文件
-[list_config.json](public/list_config.json)
+- 主列表视图：[list_config.json](public/list_config.json)
+- 子列表视图：[sub_list_config.json](public/sub_list_config.json)
 #### 配置说明
 [config_usage.md](public/config_usage.md)
 

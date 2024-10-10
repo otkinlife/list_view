@@ -1,6 +1,6 @@
 {
     "title": "测试",
-    "isPageable": true,
+    "is_pageable": true,
     "tools": [
         {
             "type": "button",
@@ -72,7 +72,7 @@
                         "type": "text",
                         "placeholder": "请输入ID"
                     },
-                    "isSupportSort": true,
+                    "is_support_sort": true,
                     "order": 1
                 },
                 "city": {
@@ -83,7 +83,7 @@
                         "dict_bind": "city",
                         "placeholder": "请选择城市"
                     },
-                    "isSupportSort": true,
+                    "is_support_sort": true,
                     "order": 1
                 },
                 "name": {
@@ -94,7 +94,7 @@
                         "type": "text",
                         "placeholder": "请输入姓名"
                     },
-                    "isSupportSort": true,
+                    "is_support_sort": true,
                     "order": 2
                 },
                 "date": {
@@ -104,7 +104,7 @@
                         "type": "date_range",
                         "format": "YYYY-MM-DD"
                     },
-                    "isSupportSort": true,
+                    "is_support_sort": true,
                     "order": 3
                 },
                 "options": {
@@ -160,7 +160,7 @@
                     ]
                 }
             },
-            "request": {
+            "req": {
                 "url": "http://localhost:8088/post",
                 "method": "POST",
                 "params": {
