@@ -1,45 +1,38 @@
 <template>
-  <div class="container">
-    <div v-if="config">
-      <div class="card">
-        <!-- 工具栏 -->
-        <ToolbarComponent :tools="config.tools" @tool-click="handleTool" />
-      </div>
+  <div v-if="config">
+  <el-dialog
+      v-model="dialogVisible"
+     :title="config.title"
+     width="80%"
+     @close="handleClose"
+  >
+    <div class="container">
+      <div v-if="config">
+        <div class="card">
+          <ToolbarComponent :tools="config.tools" @tool-click="handleTool" />
+        </div>
 
-      <div class="card">
-        <!-- 过滤组件 -->
-        <FilterComponent :filters="filters" @update-filter="updateFilter" @search="handleSearch" @reset="handleReset" />
-      </div>
+        <div class="card">
+          <FilterComponent :filters="filters" @update-filter="updateFilter" @search="handleSearch" @reset="handleReset" />
+        </div>
 
-      <div class="card">
-        <!-- 列表展示 -->
-        <TableComponent :tableData="tableData" :columns="columns" @sort-change="handleFieldSort" @tool-click="handleTool" />
+        <div class="card">
+          <TableComponent :tableData="tableData" :columns="columns" @sort-change="handleFieldSort" @tool-click="handleTool" />
 
-        <!-- 分页组件 -->
-        <PaginationComponent v-if="config.isPageable" :currentPage="currentPage" :pageSize="pageSize" :total="total" @current-change="handleCurrentChange" />
+          <PaginationComponent v-if="config.isPageable" :currentPage="currentPage" :pageSize="pageSize" :total="total" @current-change="handleCurrentChange" />
+        </div>
       </div>
     </div>
-
-    <!-- CreateDialog 组件实例 -->
-    <CreateDialog ref="createDialog" />
-    <!-- EditDialog 组件实例 -->
-    <EditDialog ref="editDialog" />
-    <!-- SubListDialog 组件实例 -->
-    <SubListDialog ref="subListDialog" />
+  </el-dialog>
   </div>
 </template>
 
 <script>
 import axios from 'axios';
-import FilterComponent from './FilterComponent.vue';
-import ToolbarComponent from './ToolbarComponent.vue';
-import TableComponent from './TableComponent.vue';
-import PaginationComponent from './PaginationComponent.vue';
-
-import CreateDialog from './custom_components/CreateDialog.vue';
-import EditDialog from './custom_components/EditDialog.vue';
-import SubListDialog from "@/components/custom_components/SubListDialog.vue";
-
+import FilterComponent from '../FilterComponent.vue';
+import ToolbarComponent from '../ToolbarComponent.vue';
+import TableComponent from '../TableComponent.vue';
+import PaginationComponent from '../PaginationComponent.vue';
 import * as tool_handlers from '@/components/utils/tools_handler'; // Import all handlers
 import * as auth_handlers from '@/components/utils/auth_handler';
 
@@ -48,13 +41,11 @@ export default {
     FilterComponent,
     ToolbarComponent,
     TableComponent,
-    PaginationComponent,
-    CreateDialog,
-    EditDialog,
-    SubListDialog
+    PaginationComponent
   },
   data() {
     return {
+      dialogVisible: false,
       config: null,
       filters: {},
       tableData: [],
@@ -63,7 +54,7 @@ export default {
       total: 0,
       sortField: '',
       sortOrder: '',
-      dictCache: {} // 全局字典缓存
+      dictCache: {}
     };
   },
   computed: {
@@ -72,10 +63,9 @@ export default {
     }
   },
   methods: {
-    // 获取配置信息
-    async fetchConfig() {
+    async fetchConfig(configPath) {
       try {
-        const response = await axios.get('/list_config.json');
+        const response = await axios.get(configPath);
         this.config = response.data;
         this.initializeFilters();
         await this.fetchData();
@@ -83,8 +73,6 @@ export default {
         console.error('Error fetching config:', error);
       }
     },
-
-    // 初始化过滤组件
     async initializeFilters() {
       const filterPromises = Object.keys(this.config.level_config[0].columns)
           .filter(key => this.config.level_config[0].columns[key].filter_field)
@@ -99,11 +87,9 @@ export default {
               format: filterField.format
             };
 
-            // 如果是 select 类型，则加载字典数据
             if (filterField.type === 'select' && filterField.dict_bind) {
               const dictKey = filterField.dict_bind;
               if (this.dictCache[dictKey]) {
-                // 从缓存中获取字典数据
                 filter.options = this.dictCache[dictKey];
               } else {
                 try {
@@ -117,7 +103,6 @@ export default {
                     const { url, method, params, auth } = dictConfig.req;
                     let axiosConfig = { method, url, params };
 
-                    // 如果配置了 auth，则调用对应的鉴权方法
                     if (auth && auth_handlers[auth]) {
                       const authData = await auth_handlers[auth]();
                       axiosConfig = {
@@ -140,7 +125,6 @@ export default {
                     }
                   }
 
-                  // 缓存字典数据
                   this.dictCache[dictKey] = filter.options;
                 } catch (error) {
                   console.error(`Error loading filter data for ${key}:`, error);
@@ -157,13 +141,10 @@ export default {
         return acc;
       }, {});
     },
-
-    // 加载列表数据
     async fetchData() {
       try {
-        const {method, url, params, headers, contentType} = this.config.level_config[0].request;
+        const { method, url, params, headers, contentType } = this.config.level_config[0].request;
 
-        // 构建请求参数
         let requestData = {
           ...params,
           page: this.currentPage,
@@ -188,7 +169,6 @@ export default {
 
         const response = await axios(axiosConfig);
 
-        // 验证响应格式
         if (response.data && response.data.code === 0) {
           this.tableData = response.data.data.items;
           this.total = response.data.data.total;
@@ -215,7 +195,7 @@ export default {
       }
       return sortParams;
     },
-    updateFilter({key, value}) {
+    updateFilter({ key, value }) {
       this.filters[key].value = value;
     },
     handleSearch() {
@@ -229,7 +209,6 @@ export default {
       this.handleSearch();
     },
     handleFieldSort(field, order) {
-      // 确保 field 和 order 是字符串
       const sortField = typeof field === 'string' ? field : '';
       const sortOrder = typeof order === 'string' ? order : '';
       if (sortField === '' && sortOrder === '') {
@@ -249,18 +228,21 @@ export default {
       } else if (style_type === 'custom_handler') {
         tool_handlers[config.handler](config.row);
       } else if (style_type === 'sub_list') {
-        let config_path = config.config_path;
-        console.log(config_path)
-        this.$refs.subListDialog.open(config_path);
+        const configPath = config.config_path;
+        this.open(configPath);
       }
     },
     handleCurrentChange(page) {
       this.currentPage = page;
       this.fetchData();
     },
-  },
-  mounted() {
-    this.fetchConfig();
+    handleClose() {
+      this.dialogVisible = false;
+    },
+    open(configPath) {
+      this.fetchConfig(configPath);
+      this.dialogVisible = true;
+    }
   }
 };
 </script>
@@ -278,11 +260,6 @@ export default {
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   padding: 20px;
-  margin-bottom: 20px;
-}
-
-h1 {
-  font-size: 24px;
   margin-bottom: 20px;
 }
 </style>

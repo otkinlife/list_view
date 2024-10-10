@@ -154,8 +154,7 @@
                             "label": "查看详情",
                             "style_type": "sub_list",
                             "config": {
-                                "config_path": "sub_list_config.json",
-                                "handler": "function1"
+                                "config_path": "/sub_list_config.json"
                             }
                         }
                     ]
