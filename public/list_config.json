@@ -1,0 +1,67 @@
+{
+    "title": "测试",
+    "isPageable": true,
+    "tools": [
+        {
+            "type": "button",
+            "label": "新增",
+            "handler": "create"
+        },
+        {
+            "type": "button",
+            "label": "删除",
+            "handler": "function2"
+        }
+    ],
+    "level_config": [
+        {
+            "columns": {
+                "id": {
+                    "label": "ID",
+                    "isHint": false,
+                    "filter_field": {
+                        "type": "text",
+                        "placeholder": "请输入ID"
+                    },
+                    "isSupportSort": true,
+                    "order": 1
+                },
+                "city": {
+                    "label": "城市",
+                    "isHint": false,
+                    "filter_field": {
+                        "type": "select",
+                        "load_data_req": {
+                            "url": "http://localhost:8088/city",
+                            "method": "GET",
+                            "params": {
+                                "conditions": "city"
+                            }
+                        }
+                    },
+                    "isSupportSort": true,
+                    "order": 1
+                },
+                "name": {
+                    "label": "姓名",
+                    "isHint": false,
+                    "handler": "handler1",
+                    "filter_field": {
+                        "type": "text",
+                        "placeholder": "姓名"
+                    },
+                    "isSupportSort": true,
+                    "order": 2
+                }
+            },
+            "request": {
+                "url": "http://localhost:8088/post",
+                "method": "POST",
+                "params": {
+                    "page": 1,
+                    "size": 10
+                }
+            }
+        }
+    ]
+}
